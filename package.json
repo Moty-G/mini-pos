@@ -8,6 +8,7 @@
     "build": "tsc && node -e \"require('fs').cpSync('src/database/schema.sql', 'dist/src/database/schema.sql'); require('fs').cpSync('src/database/seed.sql', 'dist/src/database/seed.sql');\"",
     "start": "npm run build && node dist/src/main.js",
     "dev": "npm run build && electron .",
+    "dev:server": "node --import tsx src/server.ts",
     "electron:dev": "npm run dev"
   },
   "keywords": [],
@@ -15,10 +16,14 @@
   "license": "ISC",
   "dependencies": {
     "@picocss/pico": "^2.1.1",
-    "better-sqlite3": "^12.11.1"
+    "better-sqlite3": "^12.11.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
     "@types/node": "^26.1.1",
     "electron": "^43.1.0",
     "tsx": "^4.23.0",
