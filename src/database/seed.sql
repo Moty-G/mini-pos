@@ -1,8 +1,8 @@
 -- Seed Users
 INSERT INTO users (username, password, full_name, role) VALUES
-    ('admin', 'admin123', 'Administrator', 'ADMIN'),
-    ('kasir01', 'kasir123', 'Siti Rahayu', 'CASHIER'),
-    ('kasir02', 'kasir123', 'Budi Santoso', 'CASHIER');
+    ('admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'Administrator', 'ADMIN'),
+    ('kasir01', 'f02b7c1e519e4fa436147f7e1399974f9510aa9c8e0cb8be29151eb540f9d214', 'Siti Rahayu', 'CASHIER'),
+    ('kasir02', 'f02b7c1e519e4fa436147f7e1399974f9510aa9c8e0cb8be29151eb540f9d214', 'Budi Santoso', 'CASHIER');
 
 -- Seed Categories
 INSERT INTO categories (name, description) VALUES

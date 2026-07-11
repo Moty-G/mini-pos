@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node --import tsx --test src/tests/**/*.test.ts",
-    "build": "tsc && cp src/database/*.sql dist/database/",
+    "build": "tsc && node -e \"require('fs').cpSync('src/database/schema.sql', 'dist/database/schema.sql'); require('fs').cpSync('src/database/seed.sql', 'dist/database/seed.sql');\"",
     "start": "npm run build && node dist/main.js"
   },
   "keywords": [],

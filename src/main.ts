@@ -1,109 +1,223 @@
+import * as readline from "readline";
 import { DatabaseConnection } from "./database/connection.js";
 import { ProductRepository } from "./repositories/ProductRepository.js";
-import { NotFoundError, ValidationError } from "./errors/AppError.js";
+import { CategoryRepository } from "./repositories/CategoryRepository.js";
+import { TransactionRepository } from "./repositories/TransactionRepository.js";
+import { ProductService } from "./services/ProductService.js";
+import { AuthService } from "./services/AuthService.js";
+import { TransactionService } from "./services/TransactionService.js";
+import { PaymentFactory } from "./strategies/PaymentFactory.js";
+import { AppError } from "./errors/AppError.js";
 
-// ==================== INITIALIZE DATABASE ====================
-console.log("========== INITIALIZE DATABASE ==========\n");
-
-// Inisialisasi database (buat tabel + seed data)
+// ==================== INITIALIZE ====================
 DatabaseConnection.initialize();
 
 const productRepo = new ProductRepository();
+const categoryRepo = new CategoryRepository();
+const transactionRepo = new TransactionRepository();
 
-// ==================== TEST FIND ALL ====================
-console.log("\n========== FIND ALL PRODUCTS ==========\n");
-const allProducts = productRepo.findAll();
-console.log(`Total products: ${allProducts.length}`);
-for (const p of allProducts) {
-    console.log(`  ${p.sku.padEnd(6)} ${p.name.padEnd(20)} Rp ${p.price.toLocaleString("id-ID")}`);
-}
+const productService = new ProductService(productRepo, categoryRepo);
+const authService = new AuthService();
+const transactionService = new TransactionService(transactionRepo, productRepo);
 
-// ==================== TEST FIND BY ID ====================
-console.log("\n========== FIND BY ID ==========\n");
-const product1 = productRepo.findById(1);
-console.log(`Found: ${product1.name} (${product1.sku})`);
-
-// Test NotFoundError
-try {
-    productRepo.findById(999);
-} catch (err) {
-    if (err instanceof NotFoundError) {
-        console.log(`NotFoundError (expected): ${err.message}`);
-    }
-}
-
-// ==================== TEST CREATE ====================
-console.log("\n========== CREATE PRODUCT ==========\n");
-const newProduct = productRepo.create({
-    sku: "FD004",
-    name: "Soto Ayam",
-    categoryId: 1,
-    price: 18_000,
-    stock: 20,
-    description: "Soto ayam kampung",
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
 });
-console.log(`Created: ${newProduct.name} (ID: ${newProduct.id})`);
 
-// Test ValidationError — duplicate SKU
-try {
-    productRepo.create({
-        sku: "FD001", // SKU sudah ada!
-        name: "Duplicate",
-        categoryId: 1,
-        price: 10_000,
-        stock: 10,
+const question = (query: string): Promise<string> => {
+    return new Promise((resolve) => rl.question(query, resolve));
+};
+
+async function loginFlow() {
+    console.log("\n====== LOGIN MINI POS ======");
+    const username = await question("Username: ");
+    const password = await question("Password: ");
+
+    try {
+        const user = authService.login(username, password);
+        console.log(`\nBerhasil login sebagai: ${user.full_name} (${user.role})`);
+        return true;
+    } catch (err: any) {
+        console.log(`\nLogin gagal: ${err.message}`);
+        return false;
+    }
+}
+
+async function showProducts() {
+    console.log("\n====== DAFTAR PRODUK ======");
+    const products = productService.getAllProducts();
+    if (products.length === 0) {
+        console.log("Belum ada produk.");
+        return;
+    }
+    products.forEach(p => {
+        console.log(`[${p.sku}] ${p.name.padEnd(20)} - Rp ${p.price.toLocaleString("id-ID")} (Stok: ${p.stock})`);
     });
-} catch (err) {
-    if (err instanceof ValidationError) {
-        console.log(`ValidationError (expected): ${err.message}`);
+}
+
+async function searchProduct() {
+    console.log("\n====== CARI PRODUK ======");
+    const keyword = await question("Masukkan kata kunci (nama/SKU): ");
+    const products = productService.searchProducts(keyword);
+    
+    if (products.length === 0) {
+        console.log("Produk tidak ditemukan.");
+        return;
+    }
+    products.forEach(p => {
+        console.log(`[${p.sku}] ${p.name.padEnd(20)} - Rp ${p.price.toLocaleString("id-ID")} (Stok: ${p.stock})`);
+    });
+}
+
+async function createTransaction() {
+    console.log("\n====== BUAT TRANSAKSI ======");
+    const cart: { productId: number; quantity: number }[] = [];
+    
+    while (true) {
+        const productIdStr = await question("Masukkan ID Produk (atau tekan Enter untuk lanjut ke pembayaran): ");
+        if (!productIdStr) break;
+        
+        const productId = parseInt(productIdStr);
+        if (isNaN(productId)) {
+            console.log("ID Produk tidak valid.");
+            continue;
+        }
+
+        const qtyStr = await question("Masukkan jumlah (Quantity): ");
+        const quantity = parseInt(qtyStr);
+        if (isNaN(quantity) || quantity <= 0) {
+            console.log("Jumlah tidak valid.");
+            continue;
+        }
+
+        cart.push({ productId, quantity });
+    }
+
+    if (cart.length === 0) {
+        console.log("Cart kosong. Batal membuat transaksi.");
+        return;
+    }
+
+    console.log("\nPilih Metode Pembayaran:");
+    console.log("1. CASH");
+    console.log("2. QRIS");
+    console.log("3. TRANSFER");
+    
+    const paymentMethodChoice = await question("Pilihan (1/2/3): ");
+    let strategy;
+    
+    try {
+        if (paymentMethodChoice === "1") {
+            const cashStr = await question("Nominal Uang Tunai yang diterima: Rp ");
+            const cash = parseFloat(cashStr);
+            strategy = PaymentFactory.create("CASH", { cashReceived: cash });
+        } else if (paymentMethodChoice === "2") {
+            strategy = PaymentFactory.create("QRIS");
+        } else if (paymentMethodChoice === "3") {
+            const bank = await question("Nama Bank: ");
+            strategy = PaymentFactory.create("TRANSFER", { bankName: bank });
+        } else {
+            console.log("Metode pembayaran tidak valid.");
+            return;
+        }
+
+        const user = authService.getCurrentUser();
+        if (!user) throw new Error("Anda belum login!");
+
+        const transaction = transactionService.checkout(user.id, cart, strategy);
+        console.log("\n✅ Transaksi Berhasil!\n");
+        console.log(transactionService.generateReceipt(transaction));
+    } catch (err: any) {
+        if (err instanceof AppError) {
+            console.log(`\n❌ Gagal membuat transaksi: ${err.message}`);
+        } else {
+            console.log(`\n❌ Error sistem: ${err.message}`);
+        }
     }
 }
 
-// ==================== TEST UPDATE ====================
-console.log("\n========== UPDATE PRODUCT ==========\n");
-const updated = productRepo.update(1, { price: 17_000, name: "Nasi Goreng Spesial" });
-console.log(`Updated: ${updated.name} — Rp ${updated.price.toLocaleString("id-ID")}`);
+async function showTransactionHistory() {
+    console.log("\n====== RIWAYAT TRANSAKSI ======");
+    const transactions = transactionService.getAllTransactions();
+    
+    if (transactions.length === 0) {
+        console.log("Belum ada riwayat transaksi.");
+        return;
+    }
 
-// ==================== TEST SEARCH ====================
-console.log("\n========== SEARCH ==========\n");
-const searchResults = productRepo.search("goreng");
-console.log(`Search 'goreng': ${searchResults.length} results`);
-for (const p of searchResults) {
-    console.log(`  ${p.sku} - ${p.name}`);
-}
-
-// ==================== TEST LOW STOCK ====================
-console.log("\n========== LOW STOCK ==========\n");
-const lowStock = productRepo.findLowStock();
-console.log(`Low stock products: ${lowStock.length}`);
-for (const p of lowStock) {
-    console.log(`  ⚠️ ${p.name}: ${p.stock} remaining`);
-}
-
-// ==================== TEST UPDATE STOCK ====================
-console.log("\n========== UPDATE STOCK ==========\n");
-const before = productRepo.findById(1);
-console.log(`Before: ${before.name} stock = ${before.stock}`);
-
-productRepo.updateStock(1, -5); // Kurangi 5
-const after = productRepo.findById(1);
-console.log(`After reduce 5: ${after.name} stock = ${after.stock}`);
-
-// Test stok tidak cukup
-try {
-    productRepo.updateStock(7, -100); // Chitato stok hanya 3
-} catch (err) {
-    if (err instanceof ValidationError) {
-        console.log(`ValidationError (expected): ${err.message}`);
+    transactions.forEach(t => {
+        console.log(`[${t.transactionDate.toLocaleString("id-ID")}] ${t.code} - Rp ${t.totalAmount.toLocaleString("id-ID")} (${t.paymentMethod}) - Status: ${t.paymentStatus}`);
+    });
+    
+    const cancelCode = await question("\nMasukkan ID Transaksi untuk dibatalkan (atau Enter untuk kembali): ");
+    if (cancelCode) {
+        try {
+            transactionService.cancelTransaction(parseInt(cancelCode));
+            console.log("✅ Transaksi berhasil dibatalkan dan stok dikembalikan.");
+        } catch (err: any) {
+            console.log(`❌ Gagal membatalkan transaksi: ${err.message}`);
+        }
     }
 }
 
-// ==================== TEST DELETE (SOFT) ====================
-console.log("\n========== SOFT DELETE ==========\n");
-productRepo.delete(newProduct.id);
-const afterDelete = productRepo.findAll();
-console.log(`Products after soft delete: ${afterDelete.length}`);
+async function salesReport() {
+    console.log("\n====== LAPORAN PENJUALAN HARI INI ======");
+    const today = new Date().toISOString().split('T')[0];
+    const transactions = transactionService.getByDateRange(today, today);
+    
+    const validTransactions = transactions.filter(t => t.paymentStatus === 'PAID');
+    const totalRevenue = validTransactions.reduce((sum, t) => sum + t.totalAmount, 0);
+    
+    console.log(`Total Transaksi (Sukses) : ${validTransactions.length}`);
+    console.log(`Total Pendapatan       : Rp ${totalRevenue.toLocaleString("id-ID")}`);
+}
 
-// ==================== CLEANUP ====================
-DatabaseConnection.close();
-console.log("\n========== SEMUA TEST SELESAI ==========\n");
+async function mainMenu() {
+    while (true) {
+        console.log("\n====== MINI POS ======");
+        console.log("1. Lihat Semua Produk");
+        console.log("2. Cari Produk");
+        console.log("3. Buat Transaksi Baru");
+        console.log("4. Lihat Riwayat Transaksi");
+        console.log("5. Laporan Penjualan Hari Ini");
+        console.log("6. Logout");
+        
+        const choice = await question("Pilihan: ");
+        
+        switch (choice) {
+            case "1": await showProducts(); break;
+            case "2": await searchProduct(); break;
+            case "3": await createTransaction(); break;
+            case "4": await showTransactionHistory(); break;
+            case "5": await salesReport(); break;
+            case "6":
+                authService.logout();
+                console.log("Berhasil logout.");
+                return;
+            default:
+                console.log("Pilihan tidak valid.");
+        }
+    }
+}
+
+async function startApp() {
+    while (true) {
+        const loggedIn = await loginFlow();
+        if (loggedIn) {
+            await mainMenu();
+        } else {
+            const retry = await question("Coba lagi? (y/n): ");
+            if (retry.toLowerCase() !== 'y') {
+                break;
+            }
+        }
+    }
+    
+    DatabaseConnection.close();
+    rl.close();
+    console.log("Aplikasi ditutup.");
+}
+
+// Jalankan aplikasi
+startApp();
