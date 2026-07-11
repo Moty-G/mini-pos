@@ -16,12 +16,37 @@ export class ProductRepository {
 
     /**
      * Ambil semua produk aktif.
+     * Mendukung pagination.
      */
-    findAll(): Product[] {
+    findAll(page: number = 1, limit: number = 100): Product[] {
+        const offset = (page - 1) * limit;
         const rows = this.db
-            .prepare("SELECT * FROM products WHERE is_active = 1 ORDER BY name")
-            .all() as any[];
+            .prepare("SELECT * FROM products WHERE is_active = 1 ORDER BY name LIMIT ? OFFSET ?")
+            .all(limit, offset) as any[];
         return rows.map(row => this.mapToProduct(row));
+    }
+
+    /**
+     * Ambil semua produk beserta nama kategorinya menggunakan JOIN.
+     * Mendukung pagination.
+     */
+    findAllWithCategory(page: number = 1, limit: number = 100): (Product & { category_name: string })[] {
+        const offset = (page - 1) * limit;
+        const rows = this.db
+            .prepare(`
+                SELECT p.*, c.name as category_name 
+                FROM products p
+                JOIN categories c ON p.category_id = c.id
+                WHERE p.is_active = 1 
+                ORDER BY p.name
+                LIMIT ? OFFSET ?
+            `)
+            .all(limit, offset) as any[];
+        
+        return rows.map(row => {
+            const product = this.mapToProduct(row);
+            return Object.assign(product, { category_name: row.category_name });
+        });
     }
 
     /**
