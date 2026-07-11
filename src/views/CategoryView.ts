@@ -46,12 +46,12 @@ export class CategoryView {
                 <td>${this.escapeHtml(c.name)}</td>
                 <td>${this.escapeHtml(c.description || "-")}</td>
                 <td>
-                    <div class="grid" style="gap: 0.5rem;">
-                        <button class="btn-edit outline" data-id="${c.id}" style="padding: 0.2rem;">
-                            Edit
+                    <div class="table-actions">
+                        <button class="btn-edit outline" data-id="${c.id}" title="Edit">
+                            <i class="ph ph-pencil-simple"></i> Edit
                         </button>
-                        <button class="btn-delete outline secondary" data-id="${c.id}" style="padding: 0.2rem;">
-                            Hapus
+                        <button class="btn-delete outline secondary" data-id="${c.id}" title="Hapus">
+                            <i class="ph ph-trash"></i> Hapus
                         </button>
                     </div>
                 </td>

@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini POS System</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
     <!-- Use PicoCSS from node_modules since we installed it locally -->
     <link rel="stylesheet" href="../node_modules/@picocss/pico/css/pico.min.css">
     <link rel="stylesheet" href="./styles/app.css">
@@ -12,18 +19,18 @@
     <div class="app-layout">
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
-            <header>
+            <header class="sidebar-header">
                 <hgroup>
-                    <h3>Mini POS</h3>
-                    <p>Dashboard & Produk</p>
+                    <h3><i class="ph ph-storefront"></i> Mini POS</h3>
+                    <p>Premium Dashboard</p>
                 </hgroup>
             </header>
-            <ul>
-                <li><a href="#" data-page="dashboard" class="active">Dashboard</a></li>
-                <li><a href="#" data-page="products">Produk</a></li>
-                <li><a href="#" data-page="categories">Kategori</a></li>
+            <ul class="sidebar-menu">
+                <li><a href="#" data-page="dashboard" class="active"><i class="ph ph-squares-four"></i> Dashboard</a></li>
+                <li><a href="#" data-page="products"><i class="ph ph-package"></i> Produk</a></li>
+                <li><a href="#" data-page="categories"><i class="ph ph-tag"></i> Kategori</a></li>
             </ul>
-            <footer>
+            <footer class="sidebar-footer">
                 <label>
                     <input type="checkbox" role="switch" id="theme-toggle">
                     Dark Mode
@@ -37,6 +44,6 @@
         </main>
     </div>
     <!-- Include compiled renderer -->
-    <script type="module" src="../dist/renderer.js"></script>
+    <script type="module" src="../dist/src/renderer.js"></script>
 </body>
 </html>

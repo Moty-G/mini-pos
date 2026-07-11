@@ -70,12 +70,12 @@ export class ProductView {
                     ${p.stock < 5 ? '<mark>LOW</mark>' : ''}
                 </td>
                 <td>
-                    <div class="grid" style="gap: 0.5rem;">
-                        <button class="btn-edit outline" data-id="${p.id}" style="padding: 0.2rem;">
-                            Edit
+                    <div class="table-actions">
+                        <button class="btn-edit outline" data-id="${p.id}" title="Edit">
+                            <i class="ph ph-pencil-simple"></i> Edit
                         </button>
-                        <button class="btn-delete outline secondary" data-id="${p.id}" style="padding: 0.2rem;">
-                            Hapus
+                        <button class="btn-delete outline secondary" data-id="${p.id}" title="Hapus">
+                            <i class="ph ph-trash"></i> Hapus
                         </button>
                     </div>
                 </td>
