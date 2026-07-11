@@ -3,6 +3,9 @@ import { DashboardView } from "./views/DashboardView.js";
 import { CategoryView } from "./views/CategoryView.js";
 import { ProductController } from "./controllers/ProductController.js";
 import { DashboardController } from "./controllers/DashboardController.js";
+import { TransactionView } from "./views/TransactionView.js";
+import { TransactionController } from "./controllers/TransactionController.js";
+import { ReportController } from "./controllers/ReportController.js";
 
 // ==================== NAVIGATION & ROUTING ====================
 const mainContent = document.querySelector("#main-content") as HTMLElement;
@@ -18,6 +21,16 @@ async function loadPage(pageName: string) {
         if (pageName === "dashboard") {
             const dashboardView = new DashboardView();
             new DashboardController(dashboardView);
+        } else if (pageName === "transactions") {
+            let transactionController: TransactionController;
+            const transactionView = new TransactionView(
+                (id) => { transactionController.handleAdd(id); },
+                (id) => { transactionController.handleRemove(id); },
+                () => { transactionController.handleCheckout(); },
+                (keyword) => { transactionController.handleSearch(keyword); }
+            );
+            transactionView.init();
+            transactionController = new TransactionController(transactionView);
         } else if (pageName === "products") {
             let productController: ProductController;
             const productView = new ProductView(
@@ -49,7 +62,17 @@ async function loadPage(pageName: string) {
                 }
             );
             categoryView.init();
-            // We could make CategoryController, but we just want to focus on Product & Dashboard as per PDF
+            
+            // Ambil data kategori dari backend agar tidak kosong
+            const { BrowserAPI } = await import("./utils/BrowserAPI.js");
+            const api = new BrowserAPI();
+            api.categoryGetAll().then(res => {
+                if (res.success && res.data) {
+                    categoryView.renderCategories(res.data);
+                }
+            });
+        } else if (pageName === "reports") {
+            new ReportController();
         }
     } catch (err) {
         mainContent.innerHTML = `<p>Error loading page: ${err}</p>`;

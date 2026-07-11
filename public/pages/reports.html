@@ -1,0 +1,79 @@
+<section>
+    <header>
+        <hgroup>
+            <h2>Laporan Penjualan</h2>
+            <p>Lihat dan export data penjualan</p>
+        </hgroup>
+    </header>
+
+    <!-- Filter -->
+    <div class="grid" style="margin-bottom: 2rem;">
+        <label>
+            Dari Tanggal
+            <input type="date" id="report-start-date" />
+        </label>
+        <label>
+            Sampai Tanggal
+            <input type="date" id="report-end-date" />
+        </label>
+        <label>
+            &nbsp;
+            <button id="btn-filter-report" style="width: 100%;">Filter</button>
+        </label>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid" style="margin-bottom: 2rem;">
+        <article>
+            <header style="background: transparent;">Total Revenue</header>
+            <p id="report-total-revenue" style="font-size: 1.5rem; font-weight: bold; margin: 0;">Rp 0</p>
+        </article>
+        <article>
+            <header style="background: transparent;">Jumlah Transaksi</header>
+            <p id="report-trx-count" style="font-size: 1.5rem; font-weight: bold; margin: 0;">0</p>
+        </article>
+    </div>
+
+    <!-- Revenue by Payment Method -->
+    <article style="margin-bottom: 2rem;">
+        <header>Revenue per Metode Pembayaran</header>
+        <table role="grid" style="margin: 0;">
+            <thead>
+                <tr>
+                    <th>Metode</th>
+                    <th>Jumlah Transaksi</th>
+                    <th>Total Revenue</th>
+                </tr>
+            </thead>
+            <tbody id="report-by-method">
+                <!-- Data dimuat via JS -->
+            </tbody>
+        </table>
+    </article>
+
+    <!-- Transaction Table -->
+    <article>
+        <header style="display: flex; justify-content: space-between; align-items: center;">
+            Detail Transaksi
+            <button id="btn-export-csv" class="outline" style="font-size: 0.8rem; margin: 0; padding: 0.4rem 1rem;">
+                Export CSV
+            </button>
+        </header>
+        <div style="overflow-x: auto;">
+            <table role="grid" style="margin: 0;">
+                <thead>
+                    <tr>
+                        <th>Kode</th>
+                        <th>Tanggal</th>
+                        <th>Payment</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="report-table-body">
+                    <!-- Data dimuat via JS -->
+                </tbody>
+            </table>
+        </div>
+    </article>
+</section>

@@ -40,4 +40,9 @@ export class BrowserAPI {
     async getDashboardMetrics(): Promise<any> {
         return this.fetchApi('/reports/dashboard');
     }
+
+    // Ambil Data Laporan Transaksi
+    async transactionGetReport(startDate: string, endDate: string): Promise<any> {
+        return this.fetchApi(`/transactions?start=${startDate}&end=${endDate}`);
+    }
 }

@@ -1,0 +1,59 @@
+<section>
+    <header>
+        <hgroup>
+            <h2>Kasir / Transaksi</h2>
+            <p>Pilih produk dan lakukan pembayaran</p>
+        </hgroup>
+    </header>
+
+    <div class="grid">
+        <!-- Left: Product Selection -->
+        <div>
+            <article>
+                <header>Daftar Produk</header>
+                <input type="search" id="trx-search" placeholder="Cari nama atau SKU..." />
+                
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <table role="grid">
+                        <thead>
+                            <tr>
+                                <th>Produk</th>
+                                <th>Harga</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trx-product-list">
+                            <!-- Dimuat via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </div>
+
+        <!-- Right: Cart -->
+        <div>
+            <article>
+                <header>Keranjang Belanja</header>
+                <div style="min-height: 300px;">
+                    <table role="grid">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Subtotal</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="trx-cart-body">
+                            <!-- Dimuat via JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <footer style="text-align: right;">
+                    <h3 style="margin-bottom: 1rem;">Total: <span id="trx-total-price">Rp 0</span></h3>
+                    <button id="btn-checkout" style="width: 100%;">Checkout & Bayar</button>
+                </footer>
+            </article>
+        </div>
+    </div>
+</section>

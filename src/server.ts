@@ -77,6 +77,21 @@ app.get("/api/reports/dashboard", (req, res) => {
     }
 });
 
+// API untuk mengambil transaksi (Untuk Laporan)
+app.get("/api/transactions", (req, res) => {
+    try {
+        const { start, end } = req.query;
+        let transactions = transactionRepo.findAll();
+        
+        if (start && end) {
+            transactions = transactionService.getByDateRange(String(start), String(end));
+        }
+        res.json({ success: true, data: transactions });
+    } catch (error: any) {
+        res.status(500).json({ success: false, error: error.message || String(error) });
+    }
+});
+
 // API untuk memproses transaksi (Take-Home)
 app.post("/api/transactions/process", (req, res) => {
     try {
