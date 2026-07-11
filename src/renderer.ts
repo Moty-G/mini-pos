@@ -10,6 +10,8 @@ const sampleCategories: Category[] = [
     { id: 1, name: "Makanan", description: "Makanan siap saji", created_at: "" },
     { id: 2, name: "Minuman", description: "Minuman dingin dan panas", created_at: "" },
     { id: 3, name: "Snack", description: "Makanan ringan", created_at: "" },
+    { id: 4, name: "Bumbu Dapur", description: "Penyedap masakan", created_at: "" },
+    { id: 5, name: "Kebutuhan Rumah", description: "Pembersih & alat rumah", created_at: "" },
 ];
 
 const sampleProducts: Product[] = [
@@ -97,11 +99,12 @@ const navLinks = document.querySelectorAll("[data-page]");
 navLinks.forEach(link => {
     link.addEventListener("click", (e) => {
         e.preventDefault();
-        const page = (e.target as HTMLElement).dataset.page;
+        const target = e.currentTarget as HTMLElement;
+        const page = target.dataset.page;
         
         // Update active state
         navLinks.forEach(l => l.classList.remove("active"));
-        (e.target as HTMLElement).classList.add("active");
+        target.classList.add("active");
         
         if (page) loadPage(page);
     });

@@ -8,6 +8,8 @@ export class ProductView {
     private categorySelect!: HTMLSelectElement;
     private filterCategorySelect!: HTMLSelectElement;
     private messageDiv!: HTMLElement;
+    
+    private categories: Category[] = [];
 
     // Callback functions
     private onSave: (data: any) => void;
@@ -59,15 +61,22 @@ export class ProductView {
             return;
         }
 
-        this.tableBody.innerHTML = products.map(p => `
+        this.tableBody.innerHTML = products.map(p => {
+            const cat = this.categories.find(c => c.id === p.category_id);
+            const catName = cat ? cat.name : `Kategori #${p.category_id}`;
+            return `
             <tr class="highlight-row">
                 <td><code>${this.escapeHtml(p.sku)}</code></td>
                 <td>${this.escapeHtml(p.name)}</td>
-                <td>#${p.category_id}</td>
+                <td>
+                    <span class="pico-color-azure-500" style="font-weight: 500;">
+                        ${this.escapeHtml(catName)}
+                    </span>
+                </td>
                 <td>Rp ${p.price.toLocaleString("id-ID")}</td>
                 <td>
                     ${p.stock}
-                    ${p.stock < 5 ? '<mark>LOW</mark>' : ''}
+                    ${p.stock < 5 ? '<mark style="background-color: var(--pico-color-red-500); color: white;">LOW</mark>' : ''}
                 </td>
                 <td>
                     <div class="table-actions">
@@ -80,12 +89,14 @@ export class ProductView {
                     </div>
                 </td>
             </tr>
-        `).join("");
+            `;
+        }).join("");
 
         this.bindRowEvents();
     }
 
     renderCategories(categories: Category[]): void {
+        this.categories = categories;
         if (!this.categorySelect) return;
         const options = categories.map(c => 
             `<option value="${c.id}">${this.escapeHtml(c.name)}</option>`
