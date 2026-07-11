@@ -1,0 +1,47 @@
+<section>
+    <header>
+        <hgroup>
+            <h2>Dashboard</h2>
+            <p>Ringkasan aktivitas Mini POS hari ini</p>
+        </hgroup>
+    </header>
+
+    <!-- Metrics Cards -->
+    <div class="grid">
+        <article>
+            <header>Revenue Hari Ini</header>
+            <p id="today-revenue" style="font-size: 1.5rem; font-weight: bold;">
+                Rp 0
+            </p>
+        </article>
+        <article>
+            <header>Transaksi Hari Ini</header>
+            <p id="today-trx" style="font-size: 1.5rem; font-weight: bold;">
+                0
+            </p>
+        </article>
+        <article>
+            <header>Produk Low Stock</header>
+            <p id="low-stock-count" style="font-size: 1.5rem; font-weight: bold; color: var(--pico-color-red-500);">
+                0
+            </p>
+        </article>
+    </div>
+
+    <!-- Low Stock Alert -->
+    <article>
+        <header>Produk Perlu Restock</header>
+        <table role="grid">
+            <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th>Nama</th>
+                    <th>Stok Sisa</th>
+                </tr>
+            </thead>
+            <tbody id="low-stock-table">
+                <!-- Rows di-render oleh DashboardView -->
+            </tbody>
+        </table>
+    </article>
+</section>

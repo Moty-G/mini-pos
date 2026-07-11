@@ -1,0 +1,52 @@
+<section>
+    <header>
+        <hgroup>
+            <h2>Manajemen Kategori</h2>
+            <p>Kelola kategori produk Mini POS</p>
+        </hgroup>
+    </header>
+
+    <!-- Category Form (Add/Edit) -->
+    <details id="category-form-container">
+        <summary role="button" class="outline">Tambah Kategori Baru</summary>
+        <form id="category-form">
+            <input type="hidden" name="id" id="category-id">
+            <div class="grid">
+                <label>
+                    Nama Kategori *
+                    <input type="text" name="name" required placeholder="Contoh: Minuman">
+                </label>
+            </div>
+            
+            <label>
+                Deskripsi
+                <textarea name="description" placeholder="Deskripsi kategori (opsional)"></textarea>
+            </label>
+            
+            <div class="grid">
+                <button type="submit">Simpan</button>
+                <button type="reset" class="outline">Reset</button>
+            </div>
+        </form>
+    </details>
+
+    <!-- Error/Success Message -->
+    <div id="category-message" role="alert" style="display: none;"></div>
+
+    <!-- Category Table -->
+    <figure>
+        <table role="grid">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>Deskripsi</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="category-table-body">
+                <!-- Rows di-render oleh CategoryView -->
+            </tbody>
+        </table>
+    </figure>
+</section>

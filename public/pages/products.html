@@ -1,0 +1,86 @@
+<section>
+    <header>
+        <hgroup>
+            <h2>Manajemen Produk</h2>
+            <p>Kelola data produk Mini POS</p>
+        </hgroup>
+    </header>
+
+    <!-- Search & Filter -->
+    <div class="search-bar grid">
+        <input type="search" id="product-search" placeholder="Cari produk (nama/SKU)...">
+        
+        <!-- Tantangan Tambahan: Filter by kategori -->
+        <select id="filter-category">
+            <option value="">Semua Kategori</option>
+            <!-- Di-render oleh ProductView -->
+        </select>
+    </div>
+
+    <!-- Product Form (Add/Edit) -->
+    <details id="product-form-container">
+        <summary role="button" class="outline">Tambah Produk Baru</summary>
+        <form id="product-form">
+            <div class="grid">
+                <label>
+                    SKU *
+                    <input type="text" name="sku" required placeholder="Contoh: FD001">
+                </label>
+                <label>
+                    Nama Produk *
+                    <input type="text" name="name" required placeholder="Nama produk">
+                </label>
+            </div>
+            
+            <div class="grid">
+                <label>
+                    Kategori *
+                    <select name="categoryId" required id="category-select">
+                        <option value="">-- Pilih Kategori --</option>
+                        <!-- Options di-render oleh ProductView -->
+                    </select>
+                </label>
+                <label>
+                    Harga (Rp) *
+                    <input type="number" name="price" required min="1" placeholder="0">
+                </label>
+                <label>
+                    Stok *
+                    <input type="number" name="stock" required min="0" placeholder="0">
+                </label>
+            </div>
+            
+            <label>
+                Deskripsi
+                <textarea name="description" placeholder="Deskripsi produk (opsional)"></textarea>
+            </label>
+            
+            <div class="grid">
+                <button type="submit">Simpan</button>
+                <button type="reset" class="outline">Reset</button>
+            </div>
+        </form>
+    </details>
+
+    <!-- Error/Success Message -->
+    <div id="product-message" role="alert" style="display: none;"></div>
+
+    <!-- Product Table -->
+    <figure>
+        <table role="grid">
+            <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th>Nama</th>
+                    <th>Kategori</th>
+                    <th>Harga</th>
+                    <th>Stok</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="product-table-body">
+                <!-- Rows di-render oleh ProductView -->
+            </tbody>
+        </table>
+    </figure>
+</section>

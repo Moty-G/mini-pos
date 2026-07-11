@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini POS System</title>
+    <!-- Use PicoCSS from node_modules since we installed it locally -->
+    <link rel="stylesheet" href="../node_modules/@picocss/pico/css/pico.min.css">
+    <link rel="stylesheet" href="./styles/app.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <header>
+                <hgroup>
+                    <h3>Mini POS</h3>
+                    <p>Dashboard & Produk</p>
+                </hgroup>
+            </header>
+            <ul>
+                <li><a href="#" data-page="dashboard" class="active">Dashboard</a></li>
+                <li><a href="#" data-page="products">Produk</a></li>
+                <li><a href="#" data-page="categories">Kategori</a></li>
+            </ul>
+            <footer>
+                <label>
+                    <input type="checkbox" role="switch" id="theme-toggle">
+                    Dark Mode
+                </label>
+            </footer>
+        </nav>
+        
+        <!-- Main Content Area -->
+        <main class="content" id="main-content">
+            <!-- Konten halaman di-render secara dinamis di sini -->
+        </main>
+    </div>
+    <!-- Include compiled renderer -->
+    <script type="module" src="../dist/renderer.js"></script>
+</body>
+</html>
